@@ -1,48 +1,43 @@
-#include "appserver.h"
+#include "baMng.h"
 
 #define NUM_ARGUMENTS 4
-#define ARGUMENT_FORMAT "appserver num_workers num_accounts out_file"
+#define ARGUMENT_FORMAT "baMng workersNum num_accounts out_file"
 #define MAX_COMMAND_SIZE 200
 
-/*prototype for function that parses command line arguments*/
-int arg_parser(int argc, char** argv);
 
-/*prototype for function that sets up bank accounts*/
-int account_setup();
 
-/*prototype for function that sets up cmd_buffer*/
-int command_buffer_setup();
-
-/*prototype for client loop*/
-int client_loop();
-
-/*prototype for function to print incorrect argument format to stderr*/
+/*
+function prototypes in bankAccountManager
+init and define prototypes
+*/
+//prototype for function that parses command line arguments
+int argParser(int argc, char** argv);
+//prototype for function that sets up bank accounts
+int accountSetup();
+//prototype for function that sets up cmdBf
+int cmdBufferSetup();
+//prototype for client loop
+int clientLoop();
+//prototype for function to print incorrect argument format to stderr
 void incorrect_argument_format();
-
-/*prototype for request handling worker threads*/
+//prototype for request handling worker threads
 void * request_handler();
-
-/*int to mark if the threads should be running or finishing up*/
+//int to mark if the threads should be running or finishing up
 int running = 1;
 
-/*accounts*/
+//accounts
 account * accounts;
-
-/*command buffer*/
-LinkedList * cmd_buffer;
-
-/*num_workers and accounts*/
-int num_workers;
+//command buffer
+LinkedList * cmdBf;
+//workersNum and accounts
+int workersNum;
 int num_accounts;
-
-/*lock to make str_tok threadsafe*/
+//lock to make str_tok threadsafe
 pthread_mutex_t tok_lock;
-
-/*bank lock*/
+//bank lock
 pthread_mutex_t bank_lock;
-
-/*out file*/
-FILE * out_fp;
+//out file
+FILE * outFPt;
 
 /**program used to initiate bank account server and take requests. will output
  * request results to file provided as arv[3]
@@ -55,10 +50,10 @@ FILE * out_fp;
 int main(int argc, char** argv)
 {
 	/*initialize command buffer*/
-	cmd_buffer = malloc(sizeof(LinkedList));
+	cmdBf = malloc(sizeof(LinkedList));
 
 	/*parse input arguments*/
-	if(arg_parser(argc, argv))
+	if(argParser(argc, argv))
 	{
 		/*argument error occured*/
 		return -1;
@@ -68,31 +63,31 @@ int main(int argc, char** argv)
 	accounts = malloc(num_accounts * sizeof(account));
 
 	/*set up bank accounts*/
-	if(account_setup())
+	if(accountSetup())
 	{
 		/*error encountered during bank account setup*/
 		return -1;
 	}
 
-	/*set up cmd_buffer*/
-	if(command_buffer_setup())
+	/*set up cmdBf*/
+	if(cmdBufferSetup())
 	{
 		/*error encountered during command buffer setup*/
 		return -1;
 	}
 
 	/*main command line loop*/
-	if(client_loop())
+	if(clientLoop())
 	{
 		/*error encountered during client operations*/
 		return -1;
 	}
 
 	/*free stuff*/
-	free(cmd_buffer);
+	free(cmdBf);
 	free(accounts);
 	free_accounts();
-	fclose(out_fp);
+	fclose(outFPt);
 
 	return 0;
 }
@@ -101,21 +96,21 @@ int main(int argc, char** argv)
  * @ret int: 0 = operation success, -1 = operation failure
  * @author Adam Sunderman
  * @modified 03/04/2014*/
-int arg_parser(int argc, char** argv)
+int argParser(int argc, char** argv)
 {
 	/*check for correct number of arguments*/
 	if(argc != NUM_ARGUMENTS)
 	{
-		fprintf(stderr, "error (appserver): incorrect # of command " 
+		fprintf(stderr, "error (baMng): incorrect # of command " 
 			"line arguments\n");
-		fprintf(stderr, "appserver expected format: ");
+		fprintf(stderr, "baMng expected format: ");
 		fprintf(stderr, ARGUMENT_FORMAT);
-		fprintf(stderr, "\nappserver: exiting program\n");
+		fprintf(stderr, "\nbaMng: exiting program\n");
 		return -1;
 	}
 
 	/*store arguments*/
-	if(!sscanf(argv[1], "%d", &num_workers))
+	if(!sscanf(argv[1], "%d", &workersNum))
 	{
 		/*sscanf failed to read an integer*/
 		incorrect_argument_format();
@@ -130,13 +125,13 @@ int arg_parser(int argc, char** argv)
 	}
 
 	/*open output file*/
-	out_fp = fopen(argv[3], "w");
+	outFPt = fopen(argv[3], "w");
 
-	if(!out_fp)
+	if(!outFPt)
 	{
 		/*failed to open file*/
-		fprintf(stderr, "error (appserver): failed to open out_file\n");
-		fprintf(stderr, "appserver: exiting program\n");
+		fprintf(stderr, "error (baMng): failed to open out_file\n");
+		fprintf(stderr, "baMng: exiting program\n");
 		return -1;
 	}
 
@@ -148,7 +143,7 @@ int arg_parser(int argc, char** argv)
  * @ret int: 0 = operation success -1 = failure
  * @author Adam Sunderman
  * @modified 03/24/14*/
-int account_setup()
+int accountSetup()
 {
 	/*counter*/
 	int i;
@@ -170,13 +165,13 @@ int account_setup()
  * @ret int: 0 = operation success, -1 = failure
  * @author Adam Sunderman
  * @modified 03/24/14 */
-int command_buffer_setup()
+int cmdBufferSetup()
 {
 	/*initialize command buffer*/
-	pthread_mutex_init(&(cmd_buffer->lock), NULL);
-	cmd_buffer->head = NULL;
-	cmd_buffer->tail = NULL;
-	cmd_buffer->size = 0;
+	pthread_mutex_init(&(cmdBf->lock), NULL);
+	cmdBf->head = NULL;
+	cmdBf->tail = NULL;
+	cmdBf->size = 0;
 
 	/*return successfully*/
 	return 0;
@@ -188,10 +183,10 @@ int command_buffer_setup()
  * @ret int: 0 = op success -1 = failure
  * @author Adam Sunderman
  * @modified 03/24/14 */
-int client_loop()
+int clientLoop()
 {
 	/*pthread workers*/
-	pthread_t workers[num_workers];
+	pthread_t workers[workersNum];
 
 	/*counter*/
 	int i;
@@ -209,7 +204,7 @@ int client_loop()
 	int id = 1;
 
 	/*init workers*/
-	for(i = 0; i < num_workers; i++)
+	for(i = 0; i < workersNum; i++)
 	{
 		pthread_create(&workers[i], NULL, request_handler, NULL);
 	}
@@ -247,14 +242,14 @@ int client_loop()
 	}
 
 	/*clear out command buffer*/
-	while(cmd_buffer->size > 0)
+	while(cmdBf->size > 0)
 	{
 		/*sleep to release control to worker thread*/
 		usleep(1);
 	}
 
 	/*wait for workers to finish*/
-	for(i = 0; i < num_workers; i++)
+	for(i = 0; i < workersNum; i++)
 	{
 		pthread_join(workers[i], NULL);
 	}
@@ -272,10 +267,10 @@ int client_loop()
  * @modified 03/04/2014*/
 void incorrect_argument_format()
 {
-	fprintf(stderr, "error(appserver): incorrect argument format\n");
-	fprintf(stderr, "appserver expected format: ");
+	fprintf(stderr, "error(baMng): incorrect argument format\n");
+	fprintf(stderr, "baMng expected format: ");
 	fprintf(stderr, ARGUMENT_FORMAT);
-	fprintf(stderr, "\nappserver: exiting program\n");
+	fprintf(stderr, "\nbaMng: exiting program\n");
 }
 
 void * request_handler()
@@ -308,11 +303,11 @@ void * request_handler()
 	struct timeval timestamp2;
 
 	/*while main loop is running or buffer isn't empty*/
-	while(running || cmd_buffer->size > 0)
+	while(running || cmdBf->size > 0)
 	{
 		/*if no commands are present then sleep to release
 		* control of the thread*/
-		while(cmd_buffer->size == 0 && running)
+		while(cmdBf->size == 0 && running)
 		{
 			usleep(1);
 		}
@@ -348,12 +343,12 @@ void * request_handler()
 			amount = read_account(check_account);
 			pthread_mutex_unlock(&(accounts[i-1].lock));
 			gettimeofday(&timestamp2, NULL);
-			flockfile(out_fp);
-			fprintf(out_fp, "%d BAL %d TIME %d.%06d %d.%06d\n", 
+			flockfile(outFPt);
+			fprintf(outFPt, "%d BAL %d TIME %d.%06d %d.%06d\n", 
 				cmd.id, amount, cmd.timestamp.tv_sec, 
 				cmd.timestamp.tv_usec, timestamp2.tv_sec, 
 				timestamp2.tv_usec);
-			funlockfile(out_fp);
+			funlockfile(outFPt);
 		}
 		/*is it a TRANS command*/
 		else if(strcmp(cmd_tokens[0], "TRANS") == 0 && num_tokens % 2 
@@ -411,15 +406,15 @@ void * request_handler()
 					/*if ISF then let program know and
 					* print to out file*/
 					gettimeofday(&timestamp2, NULL);
-					flockfile(out_fp);
-					fprintf(out_fp, "%d ISF %d TIME " 
+					flockfile(outFPt);
+					fprintf(outFPt, "%d ISF %d TIME " 
 						"%d.06%d %d.06%d\n", 
 						cmd.id, trans_accounts[i], 
 						cmd.timestamp.tv_sec, 
 						cmd.timestamp.tv_usec, 
 						timestamp2.tv_sec, 
 						timestamp2.tv_usec);
-					funlockfile(out_fp);
+					funlockfile(outFPt);
 					ISF = 1;
 					break;
 				}
@@ -436,12 +431,12 @@ void * request_handler()
 				}
 				/*print transaction success*/
 				gettimeofday(&timestamp2, NULL);
-				flockfile(out_fp);
-				fprintf(out_fp, "%d OK TIME %d.%06d %d.%06d\n", 
+				flockfile(outFPt);
+				fprintf(outFPt, "%d OK TIME %d.%06d %d.%06d\n", 
 					cmd.id, cmd.timestamp.tv_sec, 
 					cmd.timestamp.tv_usec, 
 					timestamp2.tv_sec, timestamp2.tv_usec);
-				funlockfile(out_fp);
+				funlockfile(outFPt);
 			}
 			/*unlock accounts*/
 			for(i = num_trans - 1; i >=0; i--)
@@ -515,38 +510,38 @@ LinkedCommand next_command()
 	LinkedCommand ret;
 
 	/*lock command buffer*/
-	pthread_mutex_lock(&(cmd_buffer->lock));
+	pthread_mutex_lock(&(cmdBf->lock));
 
 	/*are there any commands to pull?*/
-	if(cmd_buffer->size > 0)
+	if(cmdBf->size > 0)
 	{
 		/*set return value*/
-		ret.id = cmd_buffer->head->id;
+		ret.id = cmdBf->head->id;
 		ret.command = malloc(MAX_COMMAND_SIZE * sizeof(char));
-		ret.timestamp = cmd_buffer->head->timestamp;
-		strncpy(ret.command, cmd_buffer->head->command, 
+		ret.timestamp = cmdBf->head->timestamp;
+		strncpy(ret.command, cmdBf->head->command, 
 			MAX_COMMAND_SIZE);
 		ret.next = NULL;
 
 		/*move head and free memory from linked list*/
-		temp_head = cmd_buffer->head;
-		cmd_buffer->head = cmd_buffer->head->next;
+		temp_head = cmdBf->head;
+		cmdBf->head = cmdBf->head->next;
 		free(temp_head->command);
 		free(temp_head);
 
 		/*if head ran past tail set tail back to null*/
-		if(!cmd_buffer->head)
+		if(!cmdBf->head)
 		{
-			cmd_buffer->tail = NULL;
+			cmdBf->tail = NULL;
 		}
 
 		/*update linked list size*/
-		cmd_buffer->size = cmd_buffer->size - 1;
+		cmdBf->size = cmdBf->size - 1;
 	}
 	else
 	{
 		/*unlock command buffer*/
-		pthread_mutex_unlock(&(cmd_buffer->lock));
+		pthread_mutex_unlock(&(cmdBf->lock));
 
 		ret.command = NULL;
 
@@ -555,7 +550,7 @@ LinkedCommand next_command()
 	}
 
 	/*unlock command buffer*/
-	pthread_mutex_unlock(&(cmd_buffer->lock));
+	pthread_mutex_unlock(&(cmdBf->lock));
 
 	/*return command*/
 	return ret;
@@ -579,30 +574,30 @@ int add_command(char * given_command, int id)
 	new_tail->next = NULL;
 
 	/*lock command_buffer*/
-	pthread_mutex_lock(&(cmd_buffer->lock));
+	pthread_mutex_lock(&(cmdBf->lock));
 
 	/*is the list currently empty*/
-	if(cmd_buffer->size > 0)
+	if(cmdBf->size > 0)
 	{
 		/*have tail point to this new command*/
-		cmd_buffer->tail->next = new_tail;
+		cmdBf->tail->next = new_tail;
 
 		/*set new tail and increment size of linked list*/
-		cmd_buffer->tail = new_tail;
-		cmd_buffer->size = cmd_buffer->size + 1;
+		cmdBf->tail = new_tail;
+		cmdBf->size = cmdBf->size + 1;
 	}
 	else
 	{
 		/*add first element and set head and tail to it*/
-		cmd_buffer->head = new_tail;
-		cmd_buffer->tail = new_tail;
+		cmdBf->head = new_tail;
+		cmdBf->tail = new_tail;
 
 		/*size is one*/
-		cmd_buffer->size = 1;
+		cmdBf->size = 1;
 	}
 
 	/*unlock command buffer*/
-	pthread_mutex_unlock(&(cmd_buffer->lock));
+	pthread_mutex_unlock(&(cmdBf->lock));
 
 	/*return successfully*/
 	return 0;
