@@ -80,7 +80,7 @@ int main(int argc, char** argv){
 	//free stuffs
 	free(cmdBf);
 	free(accounts);
-	free_accounts();
+	freeAccount();
 	fclose(outFPt);
 
 	return 0;
@@ -216,7 +216,7 @@ int clientLoop(){
 		printf("ID %d\n", id);
 
 		//add command to buffer
-		add_command(command, id);
+		addCmd(command, id);
 
 		//incremend id
 		id++;
@@ -284,7 +284,7 @@ void * requestHdl(){
 			usleep(1);
 
 		//get next command
-		cmd = next_command();
+		cmd = nextCmd();
 
 		if(!cmd.command)
 			//if command is NULL we are currently out of commands
@@ -411,7 +411,7 @@ void * requestHdl(){
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
  * @modified 10.23.2017*/
-int lock_account(account * to_lock){
+int lockAccount(account * to_lock){
 	if(pthread_mutex_trylock(&(to_lock->lock)))
 		//lock failed return -1
 		return -1;
@@ -425,7 +425,7 @@ int lock_account(account * to_lock){
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
  * @modified 10.23.2017*/
-int unlock_account(account * to_unlock){
+int unlockAccount(account * to_unlock){
 	//unlock account
 	pthread_mutex_unlock(&(to_unlock->lock));
 
@@ -439,7 +439,7 @@ int unlock_account(account * to_unlock){
  * exists)
  * @author elithz
  * @modified 10.23.2017*/
-LinkedCommand next_command(){
+LinkedCommand nextCmd(){
 	//temporary pointer used to free head
 	LinkedCommand * temp_head;
 
@@ -494,7 +494,7 @@ LinkedCommand next_command(){
  * @ret int: 0 = operation success -1 = operation failure
  * @author elithz
  * @modified 10.23.2017*/
-int add_command(char * given_command, int id){
+int addCmd(char * given_command, int id){
 	//initialize new LinkedCommand to add to list
 	LinkedCommand * new_tail = malloc(sizeof(LinkedCommand));
 
@@ -531,4 +531,13 @@ int add_command(char * given_command, int id){
 
 	//return successfully
 	return 0;
+}
+
+
+/*
+ * frees memory allocated for Bank Accounts
+ */
+void freeAccount()
+{
+	free(BANK_accounts);
 }
