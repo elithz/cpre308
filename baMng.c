@@ -12,7 +12,7 @@
 #define NUM_ARGUMENTS 4
 #define ARGUMENT_FORMAT "baMng workersNum accountNum out_file"
 
-//function prototypes in bankAccountManagerinit and define prototypes
+//function prototypes in bankAccountManager init and define prototypes
 //prototype for function that parses command line arguments
 int argParser(int argc, char** argv);
 //prototype for function that sets up bank accounts
@@ -42,7 +42,7 @@ pthread_mutex_t bankLk;
 //out file
 FILE * outFPt;
 
-/**program used to initiate bank account server and take requests. will output
+/**program used to initiate bank account manage server and take requests. will output
  * request results to file provided as arv[3]
  * @param argv[1]: integer that represents number of working threads
  * @param argv[2]: integer that represents number of accounts
