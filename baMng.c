@@ -80,7 +80,7 @@ int main(int argc, char** argv){
 	//free stuffs
 	free(cmdBf);
 	free(accounts);
-	freeAccount();
+	// freeAccount();
 	fclose(outFPt);
 
 	return 0;
@@ -534,10 +534,10 @@ int addCmd(char * given_command, int id){
 }
 
 
-/*
- * frees memory allocated for Bank Accounts
- */
-void freeAccount()
-{
-	free(BANK_accounts);
-}
+// /*
+//  * frees memory allocated for Bank Accounts
+//  */
+// void freeAccount()
+// {
+// 	free(BANK_accounts);
+// }

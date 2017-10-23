@@ -62,8 +62,8 @@ typedef struct LinkedList_struct{
 	int size;
 }LinkedList;
 
-//frees memory allocated for Bank Accounts
-void freeAccount();
+// //frees memory allocated for Bank Accounts
+// void freeAccount();
 
 //function to attempt to lock an account mutex
 int lockAccount(account * to_lock);
