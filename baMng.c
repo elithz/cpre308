@@ -190,7 +190,7 @@ int clientLoop(){
 
 	//init workers
 	for(i = 0; i < workersNum; i++)
-		pthread_create(&workers[i], NULL, requestHdl, NULL);
+		pthread_create(&workers[i], NULL, (void*)&requestHdl, NULL);
 
 	pthread_mutex_init(&tokLk, NULL);
 	pthread_mutex_init(&bankLk, NULL);
@@ -207,7 +207,6 @@ int clientLoop(){
 		if(strcmp(command, "END") == 0){
 			//mark done
 			running = 0;
-
 			//break loop and perform cleanup
 			break;
 		}
