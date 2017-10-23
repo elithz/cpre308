@@ -8,9 +8,9 @@
 */
 
 #include "baMng.h"
+#define MAX_COMMAND_SIZE 200
 #define NUM_ARGUMENTS 4
 #define ARGUMENT_FORMAT "baMng workersNum accountNum out_file"
-#define MAX_COMMAND_SIZE 200
 
 
 //function prototypes in bankAccountManagerinit and define prototypes
@@ -50,7 +50,7 @@ FILE * outFPt;
  * @param argv[3]: string that represents name of output file
  * @ret int: 0 = operation success, -1 = error encountered
  * @author elithz
- * @modified 03/04/2014*/
+ * @modified 10.23.2017*/
 int main(int argc, char** argv)
 {
 	//initialize command buffer
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 /**function used to parse command line arguments
  * @ret int: 0 = operation success, -1 = operation failure
  * @author elithz
- * @modified 03/04/2014*/
+ * @modified 10.23.2017*/
 int argParser(int argc, char** argv)
 {
 	//check for correct number of arguments
@@ -140,7 +140,7 @@ int argParser(int argc, char** argv)
 /*function used to set up accounts
  * @ret int: 0 = operation success -1 = failure
  * @author elithz
- * @modified 03/24/14*/
+ * @modified 10.23.2017*/
 int accountSetup()
 {
 	//counter
@@ -162,7 +162,7 @@ int accountSetup()
 /*Function used to initialize command buffer
  * @ret int: 0 = operation success, -1 = failure
  * @author elithz
- * @modified 03/24/14 */
+ * @modified 10.23.2017 */
 int cmdBufferSetup()
 {
 	//initialize command buffer
@@ -180,7 +180,7 @@ int cmdBufferSetup()
  * and the threads are joined before the function returns
  * @ret int: 0 = op success -1 = failure
  * @author elithz
- * @modified 03/24/14 */
+ * @modified 10.23.2017 */
 int clientLoop()
 {
 	//pthread workers
@@ -203,9 +203,7 @@ int clientLoop()
 
 	//init workers
 	for(i = 0; i < workersNum; i++)
-	{
 		pthread_create(&workers[i], NULL, requestHdl, NULL);
-	}
 
 	pthread_mutex_init(&tokLk, NULL);
 	pthread_mutex_init(&bankLk, NULL);
@@ -241,16 +239,12 @@ int clientLoop()
 
 	//clear out command buffer
 	while(cmdBf->size > 0)
-	{
 		//sleep to release control to worker thread
 		usleep(1);
-	}
 
 	//wait for workers to finish
 	for(i = 0; i < workersNum; i++)
-	{
 		pthread_join(workers[i], NULL);
-	}
 
 	//free command
 	free(command);
@@ -262,7 +256,7 @@ int clientLoop()
 /**function used to print incorrect argument format to stderr
  * @ret void
  * @author elithz
- * @modified 03/04/2014*/
+ * @modified 10.23.2017*/
 void incorrectArgFmt()
 {
 	fprintf(stderr, "error(baMng): incorrect argument format\n");
@@ -277,13 +271,13 @@ void * requestHdl()
 	LinkedCommand cmd;
 
 	//string of arguments
-	char ** cmd_tokens = malloc(21 * sizeof(char*));
+	char ** cmdTk = malloc(21 * sizeof(char*));
 
 	//current argument
-	char * cur_tok;
+	char * curTok;
 
 	//number of arguments in command
-	int num_tokens = 0;
+	int tokenNum = 0;
 
 	//stores account to check
 	int check_account;
@@ -305,36 +299,32 @@ void * requestHdl()
 	{
 		//if no commands are present then sleep to release control of the thread
 		while(cmdBf->size == 0 && running)
-		{
 			usleep(1);
-		}
 
 		//get next command
 		cmd = next_command();
 
 		if(!cmd.command)
-		{
 			//if command is NULL we are currently out of commands
 			continue;
-		}
 
 		//parse command
 		pthread_mutex_lock(&tokLk);
-		cur_tok = strtok(cmd.command, " ");
-		while(cur_tok)
+		curTok = strtok(cmd.command, " ");
+		while(curTok)
 		{
-			cmd_tokens[num_tokens] = malloc(21 * sizeof(char));
-			strncpy(cmd_tokens[num_tokens], cur_tok, 21);
-			num_tokens++;
-			cur_tok = strtok(NULL, " ");
+			cmdTk[tokenNum] = malloc(21 * sizeof(char));
+			strncpy(cmdTk[tokenNum], curTok, 21);
+			tokenNum++;
+			curTok = strtok(NULL, " ");
 		}
 		pthread_mutex_unlock(&tokLk);
 		//execute command
 		//is it a CHECK command?
-		if(strcmp(cmd_tokens[0], "CHECK") == 0 && num_tokens == 2)
+		if(strcmp(cmdTk[0], "CHECK") == 0 && tokenNum == 2)
 		{
 			pthread_mutex_lock(&tokLk);
-			check_account = atoi(cmd_tokens[1]);
+			check_account = atoi(cmdTk[1]);
 			pthread_mutex_unlock(&tokLk);
 			pthread_mutex_lock(&(accounts[i-1].lock));
 			amount = read_account(check_account);
@@ -348,11 +338,11 @@ void * requestHdl()
 			funlockfile(outFPt);
 		}
 		//is it a TRANS command
-		else if(strcmp(cmd_tokens[0], "TRANS") == 0 && num_tokens % 2 
-			&& num_tokens > 1)
+		else if(strcmp(cmdTk[0], "TRANS") == 0 && tokenNum % 2 
+			&& tokenNum > 1)
 		{
 			//variables to store transaction info
-			int num_trans = (num_tokens - 1) / 2;
+			int num_trans = (tokenNum - 1) / 2;
 			int trans_accounts[num_trans];
 			int trans_amounts[num_trans];
 			int trans_balances[num_trans];
@@ -362,8 +352,8 @@ void * requestHdl()
 			for(i = 0; i < num_trans; i++)
 			{
 				pthread_mutex_lock(&tokLk);
-				trans_accounts[i] = atoi(cmd_tokens[i*2+1]);
-				trans_amounts[i] = atoi(cmd_tokens[i*2+2]);
+				trans_accounts[i] = atoi(cmdTk[i*2+1]);
+				trans_amounts[i] = atoi(cmdTk[i*2+2]);
 				pthread_mutex_unlock(&tokLk);
 			}
 
@@ -419,11 +409,9 @@ void * requestHdl()
 			{
 				//execute transactions
 				for(i = 0; i < num_trans; i++)
-				{
 					write_account(trans_accounts[i], 
 						(trans_balances[i] + 
 						trans_amounts[i]));
-				}
 				//print transaction success
 				gettimeofday(&timestamp2, NULL);
 				flockfile(outFPt);
@@ -440,20 +428,16 @@ void * requestHdl()
 		}
 		//invalid command
 		else
-		{
 			fprintf(stderr, "%d INVALID REQUEST FORMAT\n", cmd.id);
-		}
 		//free command
 		free(cmd.command);
-		for(i = 0; i < num_tokens; i++)
-		{
-			free(cmd_tokens[i]);
-		}
-		num_tokens = 0;
+		for(i = 0; i < tokenNum; i++)
+			free(cmdTk[i]);
+		tokenNum = 0;
 		ISF = 0;
 	}
 
-	free(cmd_tokens);
+	free(cmdTk);
 
 	//return
 	return;
@@ -463,14 +447,12 @@ void * requestHdl()
  * @param account * to_lock: account structure to attempt to lock
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
- * @modified 03/24/2014*/
+ * @modified 10.23.2017*/
 int lock_account(account * to_lock)
 {
 	if(pthread_mutex_trylock(&(to_lock->lock)))
-	{
 		//lock failed return -1
 		return -1;
-	}
 
 	//locked, return success
 	return 0;
@@ -480,7 +462,7 @@ int lock_account(account * to_lock)
  * @param account * to_unlock: account structure to attempt to unlock
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
- * @modified 03/24/2014*/
+ * @modified 10.23.2017*/
 int unlock_account(account * to_unlock)
 {
 	//unlock account
@@ -495,7 +477,7 @@ int unlock_account(account * to_unlock)
  * @ret char * command: will be next command in LinkedList (NULL if no command 
  * exists)
  * @author elithz
- * @modified 03/24/2014*/
+ * @modified 10.23.2017*/
 LinkedCommand next_command()
 {
 	//temporary pointer used to free head
@@ -526,9 +508,7 @@ LinkedCommand next_command()
 
 		//if head ran past tail set tail back to null
 		if(!cmdBf->head)
-		{
 			cmdBf->tail = NULL;
-		}
 
 		//update linked list size
 		cmdBf->size = cmdBf->size - 1;
@@ -555,7 +535,7 @@ LinkedCommand next_command()
  * @param LinkedList * command_buffer: command buffer to add command onto
  * @ret int: 0 = operation success -1 = operation failure
  * @author elithz
- * @modified 03/24/2014*/
+ * @modified 10.23.2017*/
 int add_command(char * given_command, int id)
 {
 	//initialize new LinkedCommand to add to list
