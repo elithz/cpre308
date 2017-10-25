@@ -190,8 +190,8 @@ int clientLoop(){
 
 	//init workers
 	for(i = 0; i < workersNum; i++)
-		// pthread_create(&workers[i], NULL, requestHdl, NULL);
-		pthread_create(&workers[i], NULL, (void*)&requestHdl, NULL);
+		pthread_create(&workers[i], NULL, requestHdl, NULL);
+		//pthread_create(&workers[i], NULL, (void*)&requestHdl, NULL);
 	pthread_mutex_init(&tokLk, NULL);
 	pthread_mutex_init(&bankLk, NULL);
 
