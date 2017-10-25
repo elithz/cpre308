@@ -13,19 +13,19 @@
 #define ARGUMENT_FORMAT "baMng workersNum accountNum out_file"
 
 //function prototypes in bankAccountManager init and define prototypes
-//prototype for function that parses command line arguments
+//parses command line arguments
 int argParser(int argc, char** argv);
-//prototype for function that sets up bank accounts
+//sets up bank accounts
 int accountSetup();
-//prototype for function that sets up cmdBf
+//sets up cmdBf
 int cmdBufferSetup();
-//prototype for client loop
+//client loop
 int clientLoop();
-//prototype for function to print incorrect argument format to stderr
+//print incorrect argument format to stderr
 void incorrectArgFmt();
-//prototype for request handling worker threads
+//request handling worker threads
 void * requestHdl();
-//int to mark if the threads should be running or finishing up
+//int to mark if the threads should be running or finishing up, give initial value 1
 int running = 1;
 
 //accounts
@@ -42,7 +42,7 @@ pthread_mutex_t bankLk;
 //out file
 FILE * outFPt;
 
-/**program used to initiate bank account manage server and take requests. will output
+/**initiate bank account manage server and take requests. will output
  * request results to file provided as arv[3]
  * @param argv[1]: integer that represents number of working threads
  * @param argv[2]: integer that represents number of accounts
@@ -77,7 +77,7 @@ int main(int argc, char** argv){
 		//error encountered during client operations
 		return -1;
 
-	//free stuffs
+	//free buffers
 	free(cmdBf);
 	free(accounts);
 	// freeAccount();
@@ -86,7 +86,7 @@ int main(int argc, char** argv){
 	return 0;
 }
 
-/**function used to parse command line arguments
+/**parse command line arguments
  * @ret int: 0 = operation success, -1 = operation failure
  * @author elithz
  * @modified 10.23.2017*/
@@ -128,7 +128,7 @@ int argParser(int argc, char** argv){
 	return 0;
 }
 
-/*function used to set up accounts
+/**set up accounts
  * @ret int: 0 = operation success -1 = failure
  * @author elithz
  * @modified 10.23.2017*/
@@ -139,7 +139,7 @@ int accountSetup(){
 	//initialize BANK_accounts
 	initialize_accounts(accountNum);
 
-	//loop through accountNum and create accounts for each
+	//loop through accountNum, create accounts for each
 	for(i = 0; i < accountNum; i++){
 		pthread_mutex_init(&(accounts[i].lock), NULL);
 		accounts[i].value = 0;
@@ -148,7 +148,7 @@ int accountSetup(){
 	return 0;
 }
 
-/*Function used to initialize command buffer
+/**initialize command buffer
  * @ret int: 0 = operation success, -1 = failure
  * @author elithz
  * @modified 10.23.2017 */
@@ -163,7 +163,7 @@ int cmdBufferSetup(){
 	return 0;
 }
 
-/*function that loops and executes commands as threads until the exit
+/**loops and executes commands as threads until the exit
  * function is called. After exit is called, the rest of the commands are ran
  * and the threads are joined before the function returns
  * @ret int: 0 = op success -1 = failure
@@ -172,19 +172,14 @@ int cmdBufferSetup(){
 int clientLoop(){
 	//pthread workers
 	pthread_t workers[workersNum];
-
 	//counter
 	int i;
-
 	//size_t used for getline
 	size_t n = 100;
-
 	//return value of getline
-	ssize_t read_size = 0;
-
+	ssize_t readSize = 0;
 	//entered command
 	char * command = malloc(MAX_COMMAND_SIZE * sizeof(char));
-
 	//command ID
 	int id = 1;
 
@@ -198,10 +193,10 @@ int clientLoop(){
 	//client loop
 	while(1){
 		//read line
-		read_size = getline(&command, &n, stdin);
+		readSize = getline(&command, &n, stdin);
 
 		//null terminate line
-		command[read_size - 1] = '\0';
+		command[readSize - 1] = '\0';
 
 		//check for end
 		if(strcmp(command, "END") == 0){
@@ -237,7 +232,7 @@ int clientLoop(){
 	return 0;
 }
 
-/**function used to print incorrect argument format to stderr
+/**print incorrect argument format to stderr
  * @ret void
  * @author elithz
  * @modified 10.23.2017*/
@@ -405,7 +400,7 @@ void * requestHdl(){
 	return;
 }
 
-/**function used to attempt to lock an account mutex
+/**attempt to lock an account mutex
  * @param account * to_lock: account structure to attempt to lock
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
@@ -419,7 +414,7 @@ int lockAccount(account * to_lock){
 	return 0;
 }
 
-/**function to unlock an account mutex
+/**unlock an account mutex
  * @param account * to_unlock: account structure to attempt to unlock
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
@@ -432,7 +427,7 @@ int unlockAccount(account * to_unlock){
 	return 0;
 }
 
-/**function to get next element in linked list
+/**get next element in linked list
  * @param LinkedList * command_buffer: linked list to pull from
  * @ret char * command: will be next command in LinkedList (NULL if no command 
  * exists)
@@ -488,7 +483,7 @@ LinkedCommand nextCmd(){
 	return ret;
 }
 
-/**function used to add command onto linked list
+/**add command onto linked list
  * @param LinkedList * command_buffer: command buffer to add command onto
  * @ret int: 0 = operation success -1 = operation failure
  * @author elithz

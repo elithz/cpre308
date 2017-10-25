@@ -39,13 +39,13 @@
 #include <sys/time.h>
 #endif
 
-//structure used to store a mutex lock associated with each bank account
+//store a mutex lock associated with each bank account
 typedef struct account_struct{
 	pthread_mutex_t lock;
 	int value;
 }account;
 
-//structure used to store a command within linked list
+//store a command within linked list
 typedef struct LinkedCommand_struct{
 	char * command;
 	int id;
@@ -54,7 +54,7 @@ typedef struct LinkedCommand_struct{
 	
 }LinkedCommand;
 
-//stucture used to store data about a linked list
+//data about a linked list
 typedef struct LinkedList_struct{
 	pthread_mutex_t lock;
 	LinkedCommand * head;
@@ -62,19 +62,19 @@ typedef struct LinkedList_struct{
 	int size;
 }LinkedList;
 
-// //frees memory allocated for Bank Accounts
+// //free memory allocated for bankAccount
 // void freeAccount();
 
-//function to attempt to lock an account mutex
+//lock an account mutex
 int lockAccount(account * to_lock);
 
-//function to unlock an account mutex
+//unlock an account mutex
 int unlockAccount(account * to_unlock);
 
-//function to get next command in linked list
+//get next command in linked list
 LinkedCommand nextCmd();
 
-//function used to add command onto linked list
+//add command onto linked list
 int addCmd(char * given_command, int id);
 
 #endif
