@@ -1,13 +1,16 @@
 /**
-*		Filename:  baMng.c
+*		Filename:  baMng_coarse.c
 *    Description:  Bank Account Manage Server
 *        Version:  1.0
-*        Created:  10.23.2017 13h05min23s
+*        Created:  10.25.2017 16h00min01s
 *         Author:  Ningyuan Zhang （狮子劫博丽）(elithz), elithz@iastate.edu 
 *        Company:  NERVE Software
 */
 
 #include "baMng.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #define MAX_COMMAND_SIZE 200
 #define NUM_ARGUMENTS 4
 #define ARGUMENT_FORMAT "baMng workersNum accountNum out_file"
@@ -49,7 +52,7 @@ FILE * outFPt;
  * @param argv[3]: string, name of output file
  * @ret int: 0 = operation success, -1 = error encountered
  * @author elithz
- * @modified 10.23.2017*/
+ * @modified 10.25.2017*/
 int main(int argc, char** argv){
 	//initialize command buffer
 	cmdBf = malloc(sizeof(LinkedList));
@@ -89,7 +92,7 @@ int main(int argc, char** argv){
 /**parse command line arguments
  * @ret int: 0 = operation success, -1 = operation failure
  * @author elithz
- * @modified 10.23.2017*/
+ * @modified 10.25.2017*/
 int argParser(int argc, char** argv){
 	//check for correct number of arguments
 	if(argc != NUM_ARGUMENTS){
@@ -131,7 +134,7 @@ int argParser(int argc, char** argv){
 /**set up accounts
  * @ret int: 0 = operation success -1 = failure
  * @author elithz
- * @modified 10.23.2017*/
+ * @modified 10.25.2017*/
 int accountSetup(){
 	//counter
 	int i;
@@ -151,7 +154,7 @@ int accountSetup(){
 /**initialize command buffer
  * @ret int: 0 = operation success, -1 = failure
  * @author elithz
- * @modified 10.23.2017 */
+ * @modified 10.25.2017 */
 int cmdBufferSetup(){
 	//initialize command buffer
 	pthread_mutex_init(&(cmdBf->lock), NULL);
@@ -168,7 +171,7 @@ int cmdBufferSetup(){
  * and the threads are joined before the function returns
  * @ret int: 0 = op success -1 = failure
  * @author elithz
- * @modified 10.23.2017 */
+ * @modified 10.25.2017 */
 int clientLoop(){
 	//pthread workers
 	pthread_t workers[workersNum];
@@ -235,7 +238,7 @@ int clientLoop(){
 /**print incorrect argument format to stderr
  * @ret void
  * @author elithz
- * @modified 10.23.2017*/
+ * @modified 10.25.2017*/
 void incorrectArgFmt(){
 	fprintf(stderr, "error(baMng): incorrect argument format\n");
 	fprintf(stderr, "baMng expected format: ");
@@ -300,9 +303,9 @@ void * requestHdl(){
 			pthread_mutex_lock(&tokLk);
 			check_account = atoi(cmdTk[1]);
 			pthread_mutex_unlock(&tokLk);
-			pthread_mutex_lock(&(accounts[i-1].lock));
+			pthread_mutex_lock(&bankLk);
 			amount = read_account(check_account);
-			pthread_mutex_unlock(&(accounts[i-1].lock));
+			pthread_mutex_unlock(&bankLk);
 			gettimeofday(&timestamp2, NULL);
 			flockfile(outFPt);
 			fprintf(outFPt, "%d BAL %d TIME %d.%06d %d.%06d\n", 
@@ -320,6 +323,9 @@ void * requestHdl(){
 			int trans_balances[num_trans];
 			int temp;
 
+            //lock bank
+			pthread_mutex_lock(&bankLk);
+
 			//store accounts and transfer amounts
 			for(i = 0; i < num_trans; i++){
 				pthread_mutex_lock(&tokLk);
@@ -328,43 +334,66 @@ void * requestHdl(){
 				pthread_mutex_unlock(&tokLk);
 			}
 
-			//sort transactions in ascending order by account number
-			for(i = 0; i < num_trans; i++){
-				for(j = i; j < num_trans; j++){
-					if(trans_accounts[j] < trans_accounts[i]){
-						temp = trans_accounts[i];
-						trans_accounts[i] = trans_accounts[j];
-						trans_accounts[j] = temp;
-						temp = trans_amounts[i];
-						trans_amounts[i] = trans_amounts[j];
-						trans_amounts[j] = temp;
-					}
-				}
-			}
+			// //sort transactions in ascending order by account number
+			// for(i = 0; i < num_trans; i++){
+			// 	for(j = i; j < num_trans; j++){
+			// 		if(trans_accounts[j] < trans_accounts[i]){
+			// 			temp = trans_accounts[i];
+			// 			trans_accounts[i] = trans_accounts[j];
+			// 			trans_accounts[j] = temp;
+			// 			temp = trans_amounts[i];
+			// 			trans_amounts[i] = trans_amounts[j];
+			// 			trans_amounts[j] = temp;
+			// 		}
+			// 	}
+			// }
 
-			//lock accounts
-			for(i = 0; i < num_trans; i++)
-				pthread_mutex_lock(&(accounts[trans_accounts[i]-1].lock));
+			// //lock accounts
+			// for(i = 0; i < num_trans; i++)
+			// 	pthread_mutex_lock(&(accounts[trans_accounts[i]-1].lock));
 
-			//check all transactions for sufficient funds
+			// //check all transactions for sufficient funds
+			// for(i = 0; i < num_trans; i++){
+			// 	trans_balances[i] = read_account(trans_accounts[i]);
+			// 	if(trans_balances[i] + trans_amounts[i] < 0){
+			// 		//if ISF then let program know and * print to out file
+			// 		gettimeofday(&timestamp2, NULL);
+			// 		flockfile(outFPt);
+			// 		fprintf(outFPt, "%d ISF %d TIME " 
+			// 			"%d.06%d %d.06%d\n", 
+			// 			cmd.id, trans_accounts[i], 
+			// 			cmd.timestamp.tv_sec, 
+			// 			cmd.timestamp.tv_usec, 
+			// 			timestamp2.tv_sec, 
+			// 			timestamp2.tv_usec);
+			// 		funlockfile(outFPt);
+			// 		ISF = 1;
+			// 		break;
+			// 	}
+            // }
+            
+
+            //check all transactions for sufficient funds
 			for(i = 0; i < num_trans; i++){
 				trans_balances[i] = read_account(trans_accounts[i]);
 				if(trans_balances[i] + trans_amounts[i] < 0){
-					//if ISF then let program know and * print to out file
+					//if ISF then let program know and print to out file
 					gettimeofday(&timestamp2, NULL);
-					flockfile(outFPt);
-					fprintf(outFPt, "%d ISF %d TIME " 
+					flockfile(out_fp);
+					fprintf(out_fp, "%d ISF %d TIME " 
 						"%d.06%d %d.06%d\n", 
 						cmd.id, trans_accounts[i], 
 						cmd.timestamp.tv_sec, 
 						cmd.timestamp.tv_usec, 
 						timestamp2.tv_sec, 
 						timestamp2.tv_usec);
-					funlockfile(outFPt);
+					funlockfile(out_fp);
 					ISF = 1;
 					break;
 				}
 			}
+
+
 			//if we have sufficient funds
 			if(!ISF){
 				//execute transactions
@@ -380,8 +409,9 @@ void * requestHdl(){
 				funlockfile(outFPt);
 			}
 			//unlock accounts
-			for(i = num_trans - 1; i >=0; i--)
-				pthread_mutex_unlock(&(accounts[trans_accounts[i]-1].lock));
+			// for(i = num_trans - 1; i >=0; i--)
+            // 	pthread_mutex_unlock(&(accounts[trans_accounts[i]-1].lock));
+            pthread_mutex_unlock(&bankLk);
 		}
 		//invalid command
 		else
@@ -404,7 +434,7 @@ void * requestHdl(){
  * @param account * toLk: account structure to attempt to lock
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
- * @modified 10.23.2017*/
+ * @modified 10.25.2017*/
 int lockAccount(account * toLk){
 	if(pthread_mutex_trylock(&(toLk->lock)))
 		//lock failed return -1
@@ -418,7 +448,7 @@ int lockAccount(account * toLk){
  * @param account * to_unlock: account structure to attempt to unlock
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
- * @modified 10.23.2017*/
+ * @modified 10.25.2017*/
 int unlockAccount(account * to_unlock){
 	//unlock account
 	pthread_mutex_unlock(&(to_unlock->lock));
@@ -432,7 +462,7 @@ int unlockAccount(account * to_unlock){
  * @ret char * command: will be next command in LinkedList (NULL if no command 
  * exists)
  * @author elithz
- * @modified 10.23.2017*/
+ * @modified 10.25.2017*/
 LinkedCommand nextCmd(){
 	//temporary pointer used to free head
 	LinkedCommand * temp_head;
@@ -487,7 +517,7 @@ LinkedCommand nextCmd(){
  * @param LinkedList * command_buffer: command buffer to add command onto
  * @ret int: 0 = operation success -1 = operation failure
  * @author elithz
- * @modified 10.23.2017*/
+ * @modified 10.25.2017*/
 int addCmd(char * given_command, int id){
 	//initialize new LinkedCommand to add to list
 	LinkedCommand * new_tail = malloc(sizeof(LinkedCommand));
