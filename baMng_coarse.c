@@ -1,6 +1,6 @@
 /**
 *		Filename:  baMng_coarse.c
-*    Description:  Bank Account Manage Server
+*    Description:  Bank Account Manage Server coarse ver.
 *        Version:  1.0
 *        Created:  10.25.2017 16h00min01s
 *         Author:  Ningyuan Zhang （狮子劫博丽）(elithz), elithz@iastate.edu 
@@ -274,7 +274,7 @@ void * rqstHdl(){
 		cmd = nextCmd();
 
 		if(!cmd.cmd)
-			//if cmd is NULL we are currently out of commands
+			//if cmd = NULL we are currently out of commands
 			continue;
 
 		//parse cmd
@@ -422,7 +422,7 @@ void * rqstHdl(){
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
  * @modified 10.25.2017*/
-int lockAccount(account * toLk){
+int lockAct(account * toLk){
 	if(pthread_mutex_trylock(&(toLk->lock)))
 		//lock failed return -1
 		return -1;
@@ -435,7 +435,7 @@ int lockAccount(account * toLk){
  * @ret int: 0 = operation success; -1 = operation failure
  * @author elithz
  * @modified 10.25.2017*/
-int unlockAccount(account * to_unlock){
+int uLckAct(account * to_unlock){
 	//unlock account
 	pthread_mutex_unlock(&(to_unlock->lock));
 	//return successfully
@@ -528,7 +528,7 @@ int addCmd(char * given_command, int id){
 		cmdBf->head = new_tail;
 		cmdBf->tail = new_tail;
 
-		//size is one
+		//size = one
 		cmdBf->size = 1;
 	}
 
@@ -539,7 +539,7 @@ int addCmd(char * given_command, int id){
 	return 0;
 }
 
-
+//garbage, ignore
 // /*
 //  * frees memory allocated for Bank Accounts
 //  */

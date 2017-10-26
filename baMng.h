@@ -6,12 +6,19 @@
 *         Author:  Ningyuan Zhang （狮子劫博丽）(elithz), elithz@iastate.edu 
 *        Company:  NERVE Software
 */
+
+//define needed headfiles...
 #ifndef BAMNG
 #define BAMNG
 
-#ifndef STDIO
-#define STDIO
-#include <stdio.h>
+#ifndef PTHREAD
+#define PTHREAD
+#include <pthread.h>
+#endif
+
+#ifndef BANK
+#define BANK
+#include "Bank.h"
 #endif
 
 #ifndef STDLIB
@@ -24,14 +31,9 @@
 #include <string.h>
 #endif
 
-#ifndef PTHREAD
-#define PTHREAD
-#include <pthread.h>
-#endif
-
-#ifndef BANK
-#define BANK
-#include "Bank.h"
+#ifndef STDIO
+#define STDIO
+#include <stdio.h>
 #endif
 
 #ifndef TIME
@@ -39,11 +41,6 @@
 #include <sys/time.h>
 #endif
 
-//store a mutex lock associated with each bank account
-typedef struct account_struct{
-	pthread_mutex_t lock;
-	int value;
-}account;
 
 //store a command within linked list
 typedef struct LinkedCommand_struct{
@@ -54,6 +51,13 @@ typedef struct LinkedCommand_struct{
 	
 }LinkedCommand;
 
+//store a mutex lock associated with each bank account
+typedef struct account_struct{
+	pthread_mutex_t lock;
+	int value;
+}account;
+
+
 //data about a linked list
 typedef struct LinkedList_struct{
 	pthread_mutex_t lock;
@@ -62,19 +66,21 @@ typedef struct LinkedList_struct{
 	int size;
 }LinkedList;
 
-// //free memory allocated for bankAccount
+// //free memory allocated for bankAccount not used
 // void freeAccount();
-
-//lock an account mutex
-int lockAccount(account * to_lock);
-
-//unlock an account mutex
-int unlockAccount(account * to_unlock);
 
 //get next command in linked list
 LinkedCommand nextCmd();
 
 //add command onto linked list
 int addCmd(char * given_command, int id);
+
+//lock account mutex
+int lockAct(account * to_lock);
+
+//unlock account mutex
+int uLckAct(account * to_unlock);
+
+
 
 #endif

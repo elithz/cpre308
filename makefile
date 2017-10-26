@@ -1,16 +1,12 @@
-
-
 #usage: type "make" to compile all files
 #use make clean to remove .o and executable files.
 
-#compiler to use
+#compiler
 CC=gcc
-
 ALL=baMng baMng_coarse
-
 all: $(ALL)
 
-#executable
+#executables
 baMng: baMng.o Bank.o
 	$(CC) -pthread -g -o baMng baMng.o Bank.o
 baMng_coarse: baMng_coarse.o Bank.o
