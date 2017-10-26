@@ -269,7 +269,7 @@ void * requestHdl(){
 	int i, j;
 
 	//flag to mark insufficient funds
-	int ISF = 0;
+	int isfctFd = 0;
 
 	//store timestamp
 	struct timeval timestamp2;
@@ -356,10 +356,10 @@ void * requestHdl(){
 			// for(i = 0; i < num_trans; i++){
 			// 	trans_balances[i] = read_account(trans_accounts[i]);
 			// 	if(trans_balances[i] + trans_amounts[i] < 0){
-			// 		//if ISF then let program know and * print to out file
+			// 		//if isfctFd then let program know and * print to out file
 			// 		gettimeofday(&timestamp2, NULL);
 			// 		flockfile(outFPt);
-			// 		fprintf(outFPt, "%d ISF %d TIME " 
+			// 		fprintf(outFPt, "%d isfctFd %d TIME " 
 			// 			"%d.06%d %d.06%d\n", 
 			// 			cmd.id, trans_accounts[i], 
 			// 			cmd.timestamp.tv_sec, 
@@ -367,7 +367,7 @@ void * requestHdl(){
 			// 			timestamp2.tv_sec, 
 			// 			timestamp2.tv_usec);
 			// 		funlockfile(outFPt);
-			// 		ISF = 1;
+			// 		isfctFd = 1;
 			// 		break;
 			// 	}
             // }
@@ -377,10 +377,10 @@ void * requestHdl(){
 			for(i = 0; i < num_trans; i++){
 				trans_balances[i] = read_account(trans_accounts[i]);
 				if(trans_balances[i] + trans_amounts[i] < 0){
-					//if ISF then let program know and print to out file
+					//if isfctFd then let program know and print to out file
 					gettimeofday(&timestamp2, NULL);
 					flockfile(out_fp);
-					fprintf(out_fp, "%d ISF %d TIME " 
+					fprintf(out_fp, "%d isfctFd %d TIME " 
 						"%d.06%d %d.06%d\n", 
 						cmd.id, trans_accounts[i], 
 						cmd.timestamp.tv_sec, 
@@ -388,14 +388,14 @@ void * requestHdl(){
 						timestamp2.tv_sec, 
 						timestamp2.tv_usec);
 					funlockfile(out_fp);
-					ISF = 1;
+					isfctFd = 1;
 					break;
 				}
 			}
 
 
 			//if we have sufficient funds
-			if(!ISF){
+			if(!isfctFd){
 				//execute transactions
 				for(i = 0; i < num_trans; i++)
 					write_account(trans_accounts[i], (trans_balances[i] + trans_amounts[i]));
@@ -421,7 +421,7 @@ void * requestHdl(){
 		for(i = 0; i < tokenNum; i++)
 			free(cmdTk[i]);
 		tokenNum = 0;
-		ISF = 0;
+		isfctFd = 0;
 	}
 
 	free(cmdTk);
