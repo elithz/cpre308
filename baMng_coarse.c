@@ -379,15 +379,15 @@ void * requestHdl(){
 				if(trans_balances[i] + trans_amounts[i] < 0){
 					//if isfctFd then let program know and print to out file
 					gettimeofday(&timestamp2, NULL);
-					flockfile(out_fp);
-					fprintf(out_fp, "%d isfctFd %d TIME " 
+					flockfile(outFPt);
+					fprintf(outFPt, "%d ISF %d TIME " 
 						"%d.06%d %d.06%d\n", 
 						cmd.id, trans_accounts[i], 
 						cmd.timestamp.tv_sec, 
 						cmd.timestamp.tv_usec, 
 						timestamp2.tv_sec, 
 						timestamp2.tv_usec);
-					funlockfile(out_fp);
+					funlockfile(outFPt);
 					isfctFd = 1;
 					break;
 				}

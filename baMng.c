@@ -353,7 +353,7 @@ void * requestHdl(){
 					//if isfctFd then let program know and * print to out file
 					gettimeofday(&timestamp2, NULL);
 					flockfile(outFPt);
-					fprintf(outFPt, "%d isfctFd %d TIME " 
+					fprintf(outFPt, "%d ISF %d TIME " 
 						"%d.06%d %d.06%d\n", 
 						cmd.id, trans_accounts[i], 
 						cmd.timestamp.tv_sec, 
