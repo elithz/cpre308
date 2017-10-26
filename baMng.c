@@ -43,10 +43,10 @@ pthread_mutex_t bankLk;
 FILE * outFPt;
 
 /**initiate bank account manage server and take requests. will output
- * request results to file provided as arv[3]
- * @param argv[1]: integer that represents number of working threads
- * @param argv[2]: integer that represents number of accounts
- * @param argv[3]: string that represents name of output file
+ * results to file provided at arv[3]
+ * @param argv[1]: integer, number of working threads
+ * @param argv[2]: integer, number of accounts
+ * @param argv[3]: string, name of output file
  * @ret int: 0 = operation success, -1 = error encountered
  * @author elithz
  * @modified 10.23.2017*/
@@ -56,7 +56,7 @@ int main(int argc, char** argv){
 
 	//parse input arguments
 	if(argParser(argc, argv))
-		/*argument error occured*/
+		//argument error occured
 		return -1;
 
 	//initialize account space
