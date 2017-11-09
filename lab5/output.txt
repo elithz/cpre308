@@ -1,0 +1,197 @@
+Process	arrival	runtime	priority
+0	4	38	1
+1	52	17	2
+2	40	16	2
+3	11	17	0
+4	31	16	1
+5	65	38	0
+6	18	37	1
+7	58	17	1
+8	46	13	0
+9	84	34	1
+10	47	24	1
+11	13	10	2
+12	22	35	2
+13	10	22	0
+14	97	34	0
+15	36	11	1
+16	76	17	0
+17	58	29	0
+18	1	12	0
+19	6	35	2
+
+
+First come first served
+Process 18 started at time 1
+Process 18 finished at time 13
+Process 0 started at time 13
+Process 0 finished at time 51
+Process 19 started at time 51
+Process 19 finished at time 86
+Process 13 started at time 86
+Process 13 finished at time 108
+Process 3 started at time 108
+Process 3 finished at time 125
+Process 11 started at time 125
+Process 11 finished at time 135
+Process 6 started at time 135
+Process 6 finished at time 172
+Process 12 started at time 172
+Process 12 finished at time 207
+Process 4 started at time 207
+Process 4 finished at time 223
+Process 15 started at time 223
+Process 15 finished at time 234
+Process 2 started at time 234
+Process 2 finished at time 250
+Process 8 started at time 250
+Process 8 finished at time 263
+Process 10 started at time 263
+Process 10 finished at time 287
+Process 1 started at time 287
+Process 1 finished at time 304
+Process 7 started at time 304
+Process 7 finished at time 321
+Process 17 started at time 321
+Process 17 finished at time 350
+Process 5 started at time 350
+Process 5 finished at time 388
+Process 16 started at time 388
+Process 16 finished at time 405
+Process 9 started at time 405
+Process 9 finished at time 439
+Process 14 started at time 439
+Process 14 finished at time 473
+Average time from arrival to completion is 202 seconds
+
+
+Shortest remaining time
+Process 18 started at time 1
+Process 18 finished at time 13
+Process 11 started at time 13
+Process 11 finished at time 23
+Process 3 started at time 23
+Process 3 finished at time 40
+Process 15 started at time 40
+Process 15 finished at time 51
+Process 8 started at time 51
+Process 8 finished at time 64
+Process 2 started at time 64
+Process 2 finished at time 80
+Process 4 started at time 80
+Process 4 finished at time 96
+Process 1 started at time 96
+Process 1 finished at time 113
+Process 7 started at time 113
+Process 7 finished at time 130
+Process 16 started at time 130
+Process 16 finished at time 147
+Process 13 started at time 147
+Process 13 finished at time 169
+Process 10 started at time 169
+Process 10 finished at time 193
+Process 17 started at time 193
+Process 17 finished at time 222
+Process 9 started at time 222
+Process 9 finished at time 256
+Process 14 started at time 256
+Process 14 finished at time 290
+Process 12 started at time 290
+Process 12 finished at time 325
+Process 19 started at time 325
+Process 19 finished at time 360
+Process 6 started at time 360
+Process 6 finished at time 397
+Process 0 started at time 397
+Process 0 finished at time 435
+Process 5 started at time 435
+Process 5 finished at time 473
+Average time from arrival to completion is 155 seconds
+
+
+Round Robin
+Process 18 started at time 1
+Process 18 finished at time 81
+Process 11 started at time 17
+Process 11 finished at time 150
+Process 15 started at time 36
+Process 15 finished at time 208
+Process 3 started at time 11
+Process 3 finished at time 249
+Process 8 started at time 55
+Process 8 finished at time 270
+Process 4 started at time 31
+Process 4 finished at time 282
+Process 2 started at time 40
+Process 2 finished at time 296
+Process 13 started at time 12
+Process 13 finished at time 329
+Process 1 started at time 65
+Process 1 finished at time 335
+Process 7 started at time 71
+Process 7 finished at time 338
+Process 16 started at time 78
+Process 16 finished at time 343
+Process 10 started at time 56
+Process 10 finished at time 395
+Process 19 started at time 6
+Process 19 finished at time 431
+Process 17 started at time 61
+Process 17 finished at time 438
+Process 0 started at time 4
+Process 0 finished at time 445
+Process 12 started at time 25
+Process 12 finished at time 454
+Process 6 started at time 23
+Process 6 finished at time 461
+Process 9 started at time 91
+Process 9 finished at time 468
+Process 14 started at time 114
+Process 14 finished at time 471
+Process 5 started at time 69
+Process 5 finished at time 473
+Average time from arrival to completion is 307 seconds
+
+
+Round Robin with priority
+Process 11 started at time 13
+Process 11 finished at time 37
+Process 2 started at time 41
+Process 2 finished at time 99
+Process 19 started at time 6
+Process 19 finished at time 104
+Process 1 started at time 53
+Process 1 finished at time 111
+Process 12 started at time 22
+Process 12 finished at time 119
+Process 15 started at time 119
+Process 15 finished at time 190
+Process 4 started at time 121
+Process 4 finished at time 222
+Process 7 started at time 123
+Process 7 finished at time 229
+Process 10 started at time 125
+Process 10 finished at time 259
+Process 9 started at time 124
+Process 9 finished at time 289
+Process 0 started at time 4
+Process 0 finished at time 292
+Process 6 started at time 122
+Process 6 finished at time 294
+Process 18 started at time 1
+Process 18 finished at time 364
+Process 8 started at time 294
+Process 8 finished at time 388
+Process 16 started at time 297
+Process 16 finished at time 415
+Process 3 started at time 300
+Process 3 finished at time 417
+Process 13 started at time 295
+Process 13 finished at time 435
+Process 17 started at time 298
+Process 17 finished at time 458
+Process 14 started at time 296
+Process 14 finished at time 468
+Process 5 started at time 301
+Process 5 finished at time 473
+Average time from arrival to completion is 244 seconds
