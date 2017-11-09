@@ -28,7 +28,7 @@ struct process
 
 /* Forward declarations of Scheduling algorithms */
 void first_come_first_served(struct process *proc);
-void shortestRemainTime(struct process *proc);
+void shortest_remaining_time(struct process *proc);
 void round_robin(struct process *proc);
 void round_robin_priority(struct process *proc);
 
