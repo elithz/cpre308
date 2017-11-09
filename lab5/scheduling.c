@@ -85,28 +85,28 @@ void first_come_first_served(struct process *proc)
   /* Implement scheduling algorithm here */
   //counters
   int i, j;
-  //int to store running total of completion time
+  //running total of completion time
   int totalComRunTime = 0;
-  //int to store average completion time
+  //average completion time
   int avgComRunTime;
-  //int to store system time
+  //system time
   int sysTime = 0;
-  //keep track of first come
+  //track of first come
   int firstCome;
-  //loop through num processes to execute them
+  //through num processes to execute them
   for (i = 0; i < NUM_PROCESSES; i++)
   {
     //initialize firstCome
     firstCome = i;
-    //loop through and find first come
+    //find first come
     for (j = 0; j < NUM_PROCESSES; j++)
     {
-      //if firstCome is already complete (flag = 1) then overwrite it
+      //if firstCome is already complete then overwrite it
       if (proc[firstCome].flag)
         firstCome = j;
 
       //if firstCome arrival time is after current process
-      //and current process hasn't been executed (flag = 0)
+      //and current process hasn't been executed
       //then overwrite it
       else if (proc[firstCome].arrivaltime > proc[j].arrivaltime && !proc[j].flag)
         firstCome = j;
@@ -123,18 +123,18 @@ void first_come_first_served(struct process *proc)
     sysTime += proc[firstCome].runtime;
     //set firstCome end time
     proc[firstCome].endtime = sysTime;
-    //keep track of completion time running total
+    //track of completion time running total
     totalComRunTime += (proc[firstCome].endtime - proc[firstCome].arrivaltime);
     //mark firstCome as completed
     proc[firstCome].flag = 1;
-    //print process star and finish
+    
     printf("Process %d started at time %d\n", firstCome, proc[firstCome].starttime);
     printf("Process %d finished at time %d\n", firstCome, proc[firstCome].endtime);
   }
 
   //calculate average completion time
   avgComRunTime = totalComRunTime / NUM_PROCESSES;
-  //print out average arrival to finish time
+  
   printf("Average time from arrival to completion is %d seconds\n", avgComRunTime);
 }
 
@@ -143,33 +143,33 @@ void shortest_remaining_time(struct process *proc)
   /* Implement scheduling algorithm here */
   //counters
   int i, j;
-  //int to store running total of completion time
+  //running total of completion time
   int totalComRunTime = 0;
-  //int to store average completion time
+  //average completion time
   int avgComRunTime;
-  //int to store system time
+  //system time
   int sysTime = 0;
-  //keep track of first come
+  //track of first come
   int shortestRemainTime;
 
-  //loop through num processes to execute them
+  //through num processes to execute them
   for (i = 0; i < NUM_PROCESSES; i++)
   {
     //initialize shortestRemainTime
     shortestRemainTime = -1;
-    //loop through and find shortest remaining time
+    //find shortest remaining time
     for (j = 0; j < NUM_PROCESSES; j++)
     {
       //if shortest_remaining time hasn't been set, the
       //current process has arrived (arrival time <= system
       //time) then overwrite it, and the current process
-      //hasn't finished*/
+      //hasn't finished
       if (shortestRemainTime < 0 && proc[j].arrivaltime <= sysTime && !proc[j].flag)
         shortestRemainTime = j;
       //else if shortest remaining time has been set, the
       //current process has arrived, the current process
       //runtime is shorter than shortest remaining time, and
-      //current process hasn't finished than overwrite it*/
+      //current process hasn't finished than overwrite it
       else if (shortestRemainTime >= 0 && proc[j].arrivaltime <= sysTime && proc[j].runtime < proc[shortestRemainTime].runtime && !proc[j].flag)
         shortestRemainTime = j;
     }
@@ -189,18 +189,18 @@ void shortest_remaining_time(struct process *proc)
     sysTime += proc[shortestRemainTime].runtime;
     //set shortestRemainTime end time
     proc[shortestRemainTime].endtime = sysTime;
-    //keep track of completion time running total
+    //track of completion time running total
     totalComRunTime += (proc[shortestRemainTime].endtime - proc[shortestRemainTime].arrivaltime);
     //mark shortestRemainTime as completed
     proc[shortestRemainTime].flag = 1;
-    //print process star and finish
+    
     printf("Process %d started at time %d\n", shortestRemainTime, proc[shortestRemainTime].starttime);
     printf("Process %d finished at time %d\n", shortestRemainTime, proc[shortestRemainTime].endtime);
   }
 
   //calculate average completion time
   avgComRunTime = totalComRunTime / NUM_PROCESSES;
-  //print out average arrival to finish time
+  
   printf("Average time from arrival to completion is %d seconds\n", avgComRunTime);
 }
 
@@ -210,17 +210,17 @@ void round_robin(struct process *proc)
 
   //counters
   int i, j = 0;
-  //int to store which process id we searched first at current system time
-  int start_j = 0;
-  //int to store running total of completion time
+  //which process id we searched first at current system time
+  int startJ = 0;
+  //running total of completion time
   int totalComRunTime = 0;
-  //int to store average completion time
+  //average completion time
   int avgComRunTime;
-  //int to store system time
+  //system time
   int sysTime = 0;
-  //int that is 0 until a job completes
+  //0 until a job completes
   int procFinish;
-  //loop through till all processes have completed
+  //through till all processes have completed
   for (i = 0; i < NUM_PROCESSES; i++)
   {
     //initialize procFinish
@@ -261,15 +261,15 @@ void round_robin(struct process *proc)
         //update j and increment system time
         j = (j < (NUM_PROCESSES - 1)) ? (j + 1) : 0;
         sysTime++;
-        start_j = j;
+        startJ = j;
       }
       //if proc[j] can't be ran
       else
       {
         //update j
         j = (j < (NUM_PROCESSES - 1)) ? (j + 1) : 0;
-        //if j = start_j then increment system time since no process could be run at this time
-        if (j == start_j)
+        //if j = startJ then increment system time since no process could be run at this time
+        if (j == startJ)
           sysTime++;
       }
     }
@@ -278,7 +278,7 @@ void round_robin(struct process *proc)
   //calculate average completion time
   avgComRunTime = totalComRunTime / NUM_PROCESSES;
 
-  //print out average arrival to finish time
+  
   printf("Average time from arrival to completion is %d seconds\n", avgComRunTime);
 }
 
@@ -287,22 +287,21 @@ void round_robin_priority(struct process *proc)
   /* Implement scheduling algorithm here */
   //counters
   int i, j = 0;
-
-  //int to store which process id we searched first at current system time
-  int start_j = 0;
-  //int to store running total of completion time
+  //which process id we searched first at current system time
+  int startJ = 0;
+  //running total of completion time
   int totalComRunTime = 0;
-  //int to store average completion time
+  //average completion time
   int avgComRunTime;
-  //int to store system time
+  //system time
   int sysTime = 0;
-  //int that is 0 until a job completes
+  //0 until a job completes
   int procFinish;
-  //int that stores highest priority
+  //stores highest priority
   int greatPrior;
-  //int that stores last executed process
-  int last_executed = 0;
-  //loop through till all processes have completed
+  //stores last executed process
+  int lastExec = 0;
+  //through till all processes have completed
   for (i = 0; i < NUM_PROCESSES; i++)
   {
     //initialize procFinish
@@ -321,12 +320,12 @@ void round_robin_priority(struct process *proc)
         else if (proc[j].arrivaltime <= sysTime && proc[j].flag < 2 && proc[j].priority > proc[greatPrior].priority)
           greatPrior = j;
         j = (j < (NUM_PROCESSES - 1)) ? (j + 1) : 0;
-      } while (j != start_j);
+      } while (j != startJ);
 
       //if highest_priority has been set execute
       if (greatPrior > -1)
       {
-        last_executed = greatPrior;
+        lastExec = greatPrior;
         //if greatPrior just started running initialize it
         if (!proc[greatPrior].flag)
         {
@@ -341,7 +340,7 @@ void round_robin_priority(struct process *proc)
         {
           proc[greatPrior].remainingtime--;
 
-          //if proc is finished update proc
+          //if proc is finished, update proc
           if (!proc[greatPrior].remainingtime)
           {
             //process has completed
@@ -360,15 +359,15 @@ void round_robin_priority(struct process *proc)
       }
       //increment system time and set j to search from current highest priority job
       sysTime++;
-      if (last_executed == NUM_PROCESSES - 1)
-        start_j = j = 0;
+      if (lastExec == NUM_PROCESSES - 1)
+        startJ = j = 0;
       else
-        start_j = j = (last_executed + 1);
+        startJ = j = (lastExec + 1);
     }
   }
 
   //calculate average completion time
   avgComRunTime = totalComRunTime / NUM_PROCESSES;
-  //print out average arrival to finish time
+  
   printf("Average time from arrival to completion is %d seconds\n", avgComRunTime);
 }

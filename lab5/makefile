@@ -1,10 +1,10 @@
-CC=gcc
-CFLAGS=-g
+COMPILER=gcc
+COMFLAG=-g
 ALL=scheduling
 all: $(ALL)
 
 scheduling: scheduling.c
-	$(CC) $(CFLAGS) -o scheduling scheduling.c
+	$(COMPILER) $(COMFLAG) -o scheduling scheduling.c
 
 clean:
 	rm -f $(ALL) *.o
