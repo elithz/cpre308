@@ -127,14 +127,14 @@ void first_come_first_served(struct process *proc)
     totalComRunTime += (proc[firstCome].endtime - proc[firstCome].arrivaltime);
     //mark firstCome as completed
     proc[firstCome].flag = 1;
-    
+
     printf("Process %d started at time %d\n", firstCome, proc[firstCome].starttime);
     printf("Process %d finished at time %d\n", firstCome, proc[firstCome].endtime);
   }
 
   //calculate average completion time
   avgComRunTime = totalComRunTime / NUM_PROCESSES;
-  
+
   printf("Average time from arrival to completion is %d seconds\n", avgComRunTime);
 }
 
@@ -193,14 +193,14 @@ void shortest_remaining_time(struct process *proc)
     totalComRunTime += (proc[shortestRemainTime].endtime - proc[shortestRemainTime].arrivaltime);
     //mark shortestRemainTime as completed
     proc[shortestRemainTime].flag = 1;
-    
+
     printf("Process %d started at time %d\n", shortestRemainTime, proc[shortestRemainTime].starttime);
     printf("Process %d finished at time %d\n", shortestRemainTime, proc[shortestRemainTime].endtime);
   }
 
   //calculate average completion time
   avgComRunTime = totalComRunTime / NUM_PROCESSES;
-  
+
   printf("Average time from arrival to completion is %d seconds\n", avgComRunTime);
 }
 
@@ -278,7 +278,6 @@ void round_robin(struct process *proc)
   //calculate average completion time
   avgComRunTime = totalComRunTime / NUM_PROCESSES;
 
-  
   printf("Average time from arrival to completion is %d seconds\n", avgComRunTime);
 }
 
@@ -368,6 +367,6 @@ void round_robin_priority(struct process *proc)
 
   //calculate average completion time
   avgComRunTime = totalComRunTime / NUM_PROCESSES;
-  
+
   printf("Average time from arrival to completion is %d seconds\n", avgComRunTime);
 }
