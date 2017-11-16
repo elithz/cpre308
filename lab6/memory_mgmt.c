@@ -323,7 +323,7 @@ int PRAlgo_OPT(const PageFrame *PageFrames, int num_frames, const int *PageAcces
   }
 
   //look for unmarked page, if there is one then return it
-  for(i = 0; i < num_frames; i++)
+  for(int i = 0; i < num_frames; i++)
     if(!marked[i])
       return i;
 
