@@ -1,5 +1,16 @@
+
+/**
+*		    Filename:  memory_mgmt.c
+*    Description:  memory management algorithms implementations
+*        Version:  1.0
+*        Created:  11.10.2017 22h05min23s
+*         Author:  Ningyuan Zhang （狮子劫博丽）(elithz), elithz@iastate.edu 
+*        Company:  NERVE Software
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define NUM_FRAMES 16      /* Number of Page Frames */
 #define NUM_PAGES 128      /* Number of memory pages. \
@@ -275,12 +286,13 @@ int PRAlgo_FIFO(const PageFrame *PageFrames, int num_frames, const int *PageAcce
   return index_with_least_arrival_time;
 }
 
-//LRU replacement
+//LRU algo
 int PRAlgo_LRU(const PageFrame *PageFrames, int num_frames, const int *PageAccesses, int num_accesses, int current_access){
   int lru = PageFrames[0].time_of_access;
   int indexLru = 0;
 
-  //look for least recently used page and mark it
+  //traversal frames
+  //seek least recently used page & mark
   for (int i = 1; i < num_frames; i++)
     if (PageFrames[i].time_of_access < lru){
       lru = PageFrames[i].time_of_access;
@@ -290,39 +302,39 @@ int PRAlgo_LRU(const PageFrame *PageFrames, int num_frames, const int *PageAcces
   return indexLru;
 }
 
-//OPT replacement
+//OPT algo
 int PRAlgo_OPT(const PageFrame *PageFrames, int num_frames, const int *PageAccesses, int num_accesses, int current_access)
 {
-  int indexOpt = 0;
-  int donechecking;
   int marked[num_frames];
+  int indexOpt = 0;
+  int doneCheck;
 
-  //initialize marked array
+  //init marked array
   for(int i = 0; i < num_frames; i++)
     marked[i] = 0;
 
   
   for(int i = current_access; i < num_accesses; i++){
-    //set done checking
-    donechecking = 1;
-    //loop through frames
+    //set doneCheck flag
+    doneCheck = 1;
+    //traversal frames
     for(int j = 0; j < num_frames; j++)
-      //if !marked (we haven't seen it yet)
+      //if we haven't seen it yet
       if(!marked[j]){
-        //we are not done checking if we found an unmarked page
-        donechecking = 0;
-        //if we have found our page in the future then set it as opt index
-        if (PageFrames[j].page_id == PageAccesses[i]){
+        //not doneCheck if we found unmarked page
+        doneCheck = 0;
+        //if found required page, assign it to opt index
+        if(PageFrames[j].page_id == PageAccesses[i]){
           indexOpt = j;
           marked[j] = 1;
         }
       }
-    //if all pages are marked then we are done
-    if(donechecking)
+    //if all pages marked, break
+    if(doneCheck)
       break;
   }
 
-  //look for unmarked page, if there is one then return it
+  //seek unmarked page, if yes then return
   for(int i = 0; i < num_frames; i++)
     if(!marked[i])
       return i;
@@ -330,19 +342,19 @@ int PRAlgo_OPT(const PageFrame *PageFrames, int num_frames, const int *PageAcces
   return indexOpt;
 }
 
-//custome algorithm
+//custom algorithm
 int PRAlgo_CUST(const PageFrame *PageFrames, int num_frames, const int *PageAccesses, int num_accesses, int current_access)
 {
-  //Initialize cust and temp pageframe to store the info
+  //Init cust and temp PF to hold info
   PageFrame cust = PageFrames[0];
   PageFrame temp = PageFrames[0];
-  int i;
-  int indexCust = 0;
-  int indexTemp = 0;
   int leastRecentlyUsed = PageFrames[0].time_of_access;
   int idTemp = PageFrames[0].page_id;
+  int indexCust = 0;
+  int indexTemp = 0;
 
-  for(i = 1; i < NUM_FRAMES; i++){
+  //traversal frames
+  for(int i = 1; i < num_frames; i++){
     if(PageFrames[i].time_of_access < leastRecentlyUsed){
       //Find the least recently used one
       leastRecentlyUsed = PageFrames[i].time_of_access;
@@ -356,15 +368,15 @@ int PRAlgo_CUST(const PageFrame *PageFrames, int num_frames, const int *PageAcce
       indexTemp = i;
     }
   }
-
-  for(i = current_access; i < NUM_ACCESSES; i++){ 
+  //traversal accesses
+  for(int i = current_access; i < num_accesses; i++){ 
     //In the future pages
     if(PageAccesses[i] == cust.page_id)
-      //If find the same page as cust's page, return the other one*/
+      //If find cust, return temp index
       return indexTemp;
     else if(PageAccesses[i] == temp.page_id)
-      //If find the same page as temp's page, return the other one*/
+      //If find temp, return cust index
       return indexCust;
   }
-  return indexCust; //Default return cust's page
+  return indexCust; //basecase return cust's page
 }
