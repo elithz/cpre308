@@ -1,0 +1,8 @@
+Filename	Attrib	Time		Date		Size
+16SEC  .TXT	A	20:58:05	2002/11/6	331 bytes
+1SEC   .TXT	A	20:58:05	2002/11/6	331 bytes
+2SEC   .TXT	A	20:58:05	2002/11/6	332 bytes
+4SEC   .TXT	A	20:58:05	2002/11/6	331 bytes
+8SEC   .TXT	A	20:58:05	2002/11/6	331 bytes
+BIG    .LOG	A	21:19:00	2002/11/6	62559 bytes
+(R)ead Only (H)idden (S)ystem (A)rchive

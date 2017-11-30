@@ -1,0 +1,12 @@
+                    Name:   mkdosfs
+            Bytes/Sector:   512
+         Sectors/Cluster:   16
+        Reserved Sectors:   1
+          Number of FATs:   2
+  Root Directory entries:   224
+         Logical sectors:   2880
+       Medium descriptor:   0x00f0
+             Sectors/FAT:   1
+           Sectors/Track:   18
+         Number of heads:   2
+Number of Hidden Sectors:   0
